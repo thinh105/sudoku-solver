@@ -21,67 +21,85 @@
 
 const solveSudoku = function (board) {
   const countEmptyNums = () => {};
-  const POSIBLE_NUMS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+  const possible_NUMS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
   const possibleNumsBoard = [[], [], [], [], [], [], [], [], []];
+};
 
-  const calculatePossibleNums = () => {
-    checkRows();
-    checkColumns();
-    check3x3Boxes();
+const calculatePossibleNums = () => {
+  checkRows();
+  checkColumns();
+  check3x3Boxes();
 
-    updatePossibleNums();
-  };
+  updatePossibleNums();
+};
 
-  const calculatePossibleNum = (x, y) => {
-    // quick shadow clone for one dimension array with only primitive value
-    const nums = POSIBLE_NUMS.slice();
+const calculatePossibleNum = (x, y) => {
+  // quick shadow clone for one dimension array with only primitive value
+  const nums = possible_NUMS.slice();
 
-    const posibleNumsInRow = checkRow(x, nums);
-    const posibleNumsInRowAndColumn = checkColumn(y, posibleNumsInRow);
+  const possibleNumsInRow = removeExistNumnbersInRow(x, nums);
+  const possibleNumsInRowAndColumn = removeExistNumnbersInColumn(
+    y,
+    possibleNumsInRow
+  );
 
-    const possibleNums = check3x3Box(x, y, posibleNumsInRowAndColumn);
+  const possibleNums = check3x3Box(x, y, possibleNumsInRowAndColumn);
 
-    updatePossibleNum(x, y, possibleNums);
-  };
+  updatePossibleNum(x, y, possibleNums);
+};
 
-  const checkRow = (rowIndex, posibleNums) => {
-    const allNumsInRow = removeEmptyValues(board[rowIndex]);
+exports.removeExistNumbersInRow = (row, possibleNumbers) => {
+  const existNumbersInRow = exports.removeEmptyValues(row);
 
-    return calculatePossibleNumbers(allNumsInRow, posibleNums);
-  };
+  return exports.removeExistNumbers(existNumbersInRow, possibleNumbers);
+};
 
-  const checkColumn = (columnIndex) => {
-    const columnValues = [];
+exports.getNumbersFromColumn = (columnIndex, board) => {
+  const columnValues = [];
 
-    for (const i = 0; i < 9; i++) {
-      columnValues.push(board[i][columnIndex]);
+  for (let i = 0; i < 9; i++) {
+    const value = board[i][columnIndex];
+
+    if (value !== ".") columnValues.push(Number(value));
+  }
+
+  return columnValues;
+};
+
+exports.removeExistNumbersInColumn = (numbersFromColumn, possibleNumbers) => {
+  return exports.removeExistNumbers(numbersFromColumn, possibleNumbers);
+};
+
+exports.getNumbersFromBox = (rowIndex, columnIndex, board) => {
+  const boxValues = [];
+
+  const rowIndexBox = Math.floor(rowIndex / 3);
+  const columnIndexBox = Math.floor(columnIndex / 3);
+
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      const value = board[rowIndexBox * 3 + i][columnIndexBox * 3 + j];
+
+      if (value !== ".") boxValues.push(Number(value));
     }
+  }
 
-    const allNumsFromColumn = removeEmptyValues(columnValues);
-    return calculatePossibleNumbers(allNumsFromColumn);
-  };
+  return boxValues;
+};
 
-  const check3x3Box = (rowIndex, columnIndex, posibleNums) => {
-    const rowIndexBox = (rowIndex - 1) / 3;
-    const columnIndexBox = (columnIndex - 1) / 3;
+const check3x3Box = (rowIndex, columnIndex, possibleNums) => {};
 
-    const boxValues = [];
+exports.removeEmptyValues = (array) =>
+  array.filter((element) => element !== ".").map((element) => Number(element));
 
-    for (const i = 0; i < 3; i++) {}
-  };
+const updateNum = (newVal, x, y) => {
+  board[x][y] = newVal;
+  calculatePossibleNums();
+};
 
-  const removeEmptyValues = (array) =>
-    array.filter((element) => element !== ".");
-
-  const calculatePossibleNumbers = (numbers, posibleNums) => {
-    return posibleNums.filter((el) => !numbers.includes(el));
-  };
-
-  const updateNum = (newVal, x, y) => {
-    board[x][y] = newVal;
-    calculatePossibleNums();
-  };
+exports.removeExistNumbers = (existNumbers, possibleNums) => {
+  return possibleNums.filter((el) => !existNumbers.includes(el));
 };
 
 // Output:
