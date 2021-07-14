@@ -19,43 +19,54 @@
  * ]
  */
 
-const solveSudoku = function (board) {
-  const countEmptyNums = () => {};
-  const possible_NUMS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-
-  const possibleNumsBoard = [[], [], [], [], [], [], [], [], []];
-};
+const solveSudoku = function (board) {};
 
 const calculatePossibleNums = () => {
-  checkRows();
-  checkColumns();
-  check3x3Boxes();
+  calculateNums: for (let i = 0; i < 9; i++) {
+    for (let j = 0; j < 9; i++) {
+      if (board[i][j] === ".") {
+        const possibleNums = calculatePossibleNum(i, j, board);
 
-  updatePossibleNums();
+        if ((possibleNums.length = 1)) {
+          updateNum(i, j, board);
+          break calculateNums;
+        }
+      }
+    }
+  }
 };
 
-const calculatePossibleNum = (x, y) => {
+exports.calculatePossibleNum = (x, y, board) => {
   // quick shadow clone for one dimension array with only primitive value
-  const nums = possible_NUMS.slice();
+  let possibleNums = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-  const possibleNumsInRow = removeExistNumnbersInRow(x, nums);
-  const possibleNumsInRowAndColumn = removeExistNumnbersInColumn(
-    y,
-    possibleNumsInRow
+  const existNumbersInRow = board[x]
+    .filter((element) => element !== ".")
+    .map((element) => Number(element));
+
+  const existNumbersFromColumn = exports.getExistNumbersFromColumn(y, board);
+  const existNumbersFromBox = exports.getExistNumbersFromBox(x, y, board);
+
+  const existNumbers = exports.mergeArraysWithUniqueValues(
+    existNumbersInRow,
+    existNumbersFromColumn,
+    existNumbersFromBox
   );
 
-  const possibleNums = check3x3Box(x, y, possibleNumsInRowAndColumn);
-
-  updatePossibleNum(x, y, possibleNums);
+  return exports.removeExistNumbers(existNumbers, possibleNums);
 };
 
-exports.removeExistNumbersInRow = (row, possibleNumbers) => {
-  const existNumbersInRow = exports.removeEmptyValues(row);
+exports.mergeArraysWithUniqueValues = (...arrays) => {
+  let temp = [];
 
-  return exports.removeExistNumbers(existNumbersInRow, possibleNumbers);
+  for (const array of arrays) {
+    temp = [...temp, ...array.filter((item) => !temp.includes(item))];
+  }
+
+  return temp;
 };
 
-exports.getNumbersFromColumn = (columnIndex, board) => {
+exports.getExistNumbersFromColumn = (columnIndex, board) => {
   const columnValues = [];
 
   for (let i = 0; i < 9; i++) {
@@ -67,11 +78,7 @@ exports.getNumbersFromColumn = (columnIndex, board) => {
   return columnValues;
 };
 
-exports.removeExistNumbersInColumn = (numbersFromColumn, possibleNumbers) => {
-  return exports.removeExistNumbers(numbersFromColumn, possibleNumbers);
-};
-
-exports.getNumbersFromBox = (rowIndex, columnIndex, board) => {
+exports.getExistNumbersFromBox = (rowIndex, columnIndex, board) => {
   const boxValues = [];
 
   const rowIndexBox = Math.floor(rowIndex / 3);
@@ -88,18 +95,13 @@ exports.getNumbersFromBox = (rowIndex, columnIndex, board) => {
   return boxValues;
 };
 
-const check3x3Box = (rowIndex, columnIndex, possibleNums) => {};
-
-exports.removeEmptyValues = (array) =>
-  array.filter((element) => element !== ".").map((element) => Number(element));
+exports.removeExistNumbers = (existNumbers, possibleNums) => {
+  return possibleNums.filter((el) => !existNumbers.includes(el));
+};
 
 const updateNum = (newVal, x, y) => {
   board[x][y] = newVal;
   calculatePossibleNums();
-};
-
-exports.removeExistNumbers = (existNumbers, possibleNums) => {
-  return possibleNums.filter((el) => !existNumbers.includes(el));
 };
 
 // Output:
